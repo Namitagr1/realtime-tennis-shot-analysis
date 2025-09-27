@@ -189,7 +189,7 @@ if run_pipeline and selected_video:
                     f"**Max Arm Angle:** {max_arm_angle:.1f}°"
                 )
 
-                time.sleep(1.0 / fps)
+                #time.sleep(1.0 / fps)
 
             cap.release()
             st.success("Video analysis finished!")
