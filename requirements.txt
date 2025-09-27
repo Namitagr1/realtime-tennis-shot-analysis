@@ -15,3 +15,5 @@ matplotlib
 streamlit
 tqdm
 pyyaml
+plotly
+streamlit-plotly-events

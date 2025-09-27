@@ -7,7 +7,7 @@ services:
     volumes:
       - ./data:/app/data        # videos
       - ./src:/app/src          # code for live edits
-      - ./models:/app/models    # <--- ADD THIS LINE
+      - ./models:/app/models    # models
     environment:
       - PYTHONUNBUFFERED=1
     command: streamlit run src/app.py --server.port=8080 --server.address=0.0.0.0

@@ -25,7 +25,7 @@ selected_video = st.sidebar.selectbox("Choose a video", video_files)
 # Calibration: ball diameter in pixels
 pixel_ball_diameter = 31
 
-meters_per_pixel = 0.067 / pixel_ball_diameter
+meters_per_pixel = 0.067 / pixel_ball_diameter  # tennis ball diameter = 6.7 cm
 
 run_pipeline = st.sidebar.button("Run Analysis")
 
