@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  tennis-tracker:
+    build: .
+    container_name: realtime-tennis-shot-analysis
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data        # videos
+      - ./src:/app/src          # code for live edits
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: streamlit run src/app.py --server.port=8080 --server.address=0.0.0.0
