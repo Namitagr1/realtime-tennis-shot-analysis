@@ -6,11 +6,13 @@ from collections import deque
 import matplotlib.pyplot as plt
 from ultralytics import YOLO
 import mediapipe as mp
+import google.generativeai as genai
 
 # ==============================
 # Sidebar Config
 # ==============================
 st.sidebar.title("🎾 Tennis Shot Analysis (Player + Ball)")
+genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 # Paths relative to src/
 BASE_DIR = os.path.dirname(__file__)
@@ -27,13 +29,15 @@ pixel_ball_diameter = 31
 
 meters_per_pixel = 0.067 / pixel_ball_diameter  # tennis ball diameter = 6.7 cm
 
+shot_types = ["Forehand", "Backhand", "Slice", "Drop Shot", "Serve"]
+selected_shot = st.sidebar.selectbox("Select Shot Type", shot_types)
+
 run_pipeline = st.sidebar.button("Run Analysis")
 
 # ==============================
 # Page Title
 # ==============================
-st.title("🎥 Tennis Shot Analysis (Front-On View)")
-st.write("Tracks ball speed, spin, and predicts landing. Highlights player’s arm swing angles.")
+st.title("Single Shot Analysis (Front-On)")
 
 # ==============================
 # MediaPipe Pose Setup
@@ -69,6 +73,17 @@ if run_pipeline and selected_video:
             graph_placeholder = st.empty()
             summary_placeholder = st.empty()
             progress_bar = st.progress(0)
+            coaching_placeholder = st.empty()
+
+            try:
+                gemini = genai.GenerativeModel("gemini-2.5-flash")
+                prompt = f"Give 3 concise, high-level tennis coaching tips for improving a {selected_shot} as a numbered list. Do not output anything other than the numbered list of tips."
+                response = gemini.generate_content(prompt)
+                coaching_tips = response.text
+            except Exception as e:
+                coaching_tips = f"⚠️ Error fetching Gemini insights: {e}"
+
+            coaching_placeholder.markdown(f"### 🤖 AI Coaching Insights ({selected_shot})\n{coaching_tips}")
 
             # Histories
             prev_positions = deque(maxlen=5)
@@ -118,7 +133,7 @@ if run_pipeline and selected_video:
                             (x1p, y1p), (x2p, y2p) = prev_positions[-2], prev_positions[-1]
                             dist_m = np.sqrt((x2p - x1p) ** 2 + (y2p - y1p) ** 2) * meters_per_pixel
                             ball_speed_mps = dist_m * fps
-                            ball_speed_mph = ball_speed_mps * 2.23694
+                            ball_speed_mph = ball_speed_mps * 2.23694 * 4
                             speed_history.append(ball_speed_mph)
                             max_speed = max(max_speed, ball_speed_mph)
 
@@ -130,7 +145,7 @@ if run_pipeline and selected_video:
                             if len(prev_positions) >= 3:
                                 x0, y0 = prev_positions[-3]
                                 curve_m = ((x2p - x1p) - (x1p - x0)) * meters_per_pixel
-                                spin_rpm = abs(curve_m / 0.026) * fps * 60
+                                spin_rpm = abs(curve_m / 0.026) * fps * 11
                                 spin_history.append(spin_rpm)
                                 max_spin = max(max_spin, spin_rpm)
 
@@ -179,37 +194,13 @@ if run_pipeline and selected_video:
                 # -------------------------
                 cv2.putText(frame, f"Speed: {ball_speed_mph:.1f} mph", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                cv2.putText(frame, f"Angle: {angle_deg:.1f} deg", (10, 60),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
-                cv2.putText(frame, f"Spin: {spin_rpm:.0f} RPM", (10, 90),
+                cv2.putText(frame, f"Spin: {spin_rpm:.0f} RPM", (10, 60),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-                cv2.putText(frame, f"Arm Angle: {arm_angle:.1f}°", (10, 120),
+                cv2.putText(frame, f"Arm Angle: {arm_angle:.1f} deg", (10, 90),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
 
                 # Streamlit Updates
                 frame_placeholder.image(frame, channels="BGR", use_container_width=True)
-
-                stats_placeholder.markdown(
-                    f"**Ball Speed:** {ball_speed_mph:.1f} mph  \n"
-                    f"**Shot Angle:** {angle_deg:.1f}°  \n"
-                    f"**Spin:** {spin_rpm:.0f} RPM  \n"
-                    f"**Arm Angle:** {arm_angle:.1f}°  \n"
-                    + (f"**Predicted Landing:** {predicted_landing}" if predicted_landing else "")
-                )
-
-                # Plot graphs
-                if speed_history:
-                    plt.figure(figsize=(6, 2))
-                    plt.plot(speed_history, color="red", linewidth=2, label="Speed (mph)")
-                    if spin_history:
-                        plt.plot(spin_history, color="blue", linewidth=1, alpha=0.7, label="Spin (RPM)")
-                    plt.legend()
-                    plt.title("Ball Metrics Over Time")
-                    plt.xlabel("Frame")
-                    plt.grid(True)
-                    plt.tight_layout()
-                    graph_placeholder.pyplot(plt)
-                    plt.close()
 
                 # Progress
                 progress_bar.progress(frame_idx / frame_count)
