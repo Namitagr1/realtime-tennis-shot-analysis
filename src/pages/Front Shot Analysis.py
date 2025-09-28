@@ -8,6 +8,9 @@ from ultralytics import YOLO
 import mediapipe as mp
 import google.generativeai as genai
 
+from navbar import navbar
+navbar()
+
 # ==============================
 # Sidebar Config
 # ==============================
@@ -16,8 +19,8 @@ genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 # Paths relative to src/
 BASE_DIR = os.path.dirname(__file__)
-DATA_DIR = os.path.join(BASE_DIR, "../data")
-MODEL_DIR = os.path.join(BASE_DIR, "../models")
+DATA_DIR = os.path.join(BASE_DIR, "../../data")
+MODEL_DIR = os.path.join(BASE_DIR, "../../models")
 MODEL_PATH = os.path.join(MODEL_DIR, "yolov8s.pt")
 
 # Video selector

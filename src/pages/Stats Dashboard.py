@@ -7,6 +7,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from navbar import navbar
+navbar()
+
+
 # --------------------------
 # Plotly config (user requested)
 # --------------------------
@@ -19,7 +23,7 @@ st.title("🎾 Tennis Performance Trends Dashboard")
 # Paths
 # --------------------------
 BASE_DIR = os.path.dirname(__file__)
-ATP_DIR = os.path.join(BASE_DIR, "../data/atp")
+ATP_DIR = os.path.join(BASE_DIR, "../../data/atp")
 
 # --------------------------
 # Load all ATP match CSVs (cached)

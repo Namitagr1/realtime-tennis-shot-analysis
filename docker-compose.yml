@@ -11,16 +11,4 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - GEMINI_API_KEY=
-    command: streamlit run src/app.py --server.port=8080 --server.address=0.0.0.0
-
-  tennis-stats:
-    build: .
-    container_name: tennis-stats-dashboard
-    ports:
-      - "8501:8501"   # 👈 different port
-    volumes:
-      - ./data:/app/data
-      - ./src:/app/src
-    environment:
-      - PYTHONUNBUFFERED=1
-    command: streamlit run src/stats_dashboard.py --server.port=8501 --server.address=0.0.0.0
+    command: streamlit run src/Home.py --server.port=8080 --server.address=0.0.0.0

@@ -14,6 +14,9 @@ import streamlit as st
 from pathlib import Path
 from ultralytics import YOLO
 
+from navbar import navbar
+navbar()
+
 # =========================
 # Utilities: paths & video
 # =========================
@@ -358,7 +361,7 @@ with st.sidebar:
                           help="Rally starts when ball speed exceeds this for 3 frames; ends after 10 still frames.")
     force_rally = st.checkbox("Force rally (always on)", value=False)
 
-    run_btn = st.button("▶️ Run full-court analysis", type="primary", use_container_width=True)
+    run_btn = st.button("▶️ Run full-court analysis", type="primary", width='content')
 
 videos_dir = resolve_video_dir(data_dir_in)
 videos = collect_videos(videos_dir)
@@ -578,7 +581,7 @@ if run_btn:
                          (230, 230, 230), 1, lineType=cv2.LINE_AA)
 
         # Stream current frame
-        video_area.image(cv2.cvtColor(disp, cv2.COLOR_BGR2RGB), channels="RGB", use_container_width=True)
+        video_area.image(cv2.cvtColor(disp, cv2.COLOR_BGR2RGB), channels="RGB", width='content')
 
     cap.release()
 
