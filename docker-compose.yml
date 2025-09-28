@@ -10,7 +10,7 @@ services:
       - ./models:/app/models
     environment:
       - PYTHONUNBUFFERED=1
-      - GEMINI_API_KEY=AIzaSyAbpKXkoCeLCzw6SaocWRgGYiWNRTdSHpY
+      - GEMINI_API_KEY=
     command: streamlit run src/app.py --server.port=8080 --server.address=0.0.0.0
 
   tennis-stats:
