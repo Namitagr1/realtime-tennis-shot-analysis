@@ -10,4 +10,5 @@ services:
       - ./models:/app/models    # models
     environment:
       - PYTHONUNBUFFERED=1
+      - GEMINI_API_KEY=AIzaSyAbpKXkoCeLCzw6SaocWRgGYiWNRTdSHpY
     command: streamlit run src/app.py --server.port=8080 --server.address=0.0.0.0
